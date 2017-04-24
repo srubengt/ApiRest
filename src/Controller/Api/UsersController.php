@@ -30,4 +30,23 @@ class UsersController extends AppController
         });
         return $this->Crud->execute();
     }
+
+    public function token()
+    {
+        $user = $this->Auth->identify();
+        if (!$user) {
+            throw new UnauthorizedException('Invalid username or password');
+        }
+        $this->set([
+            'success' => true,
+            'data' => [
+                'token' => JWT::encode([
+                    'sub' => $user['id'],
+                    'exp' =>  time() + 604800
+                ],
+                    Security::salt())
+            ],
+            '_serialize' => ['success', 'data']
+        ]);
+    }
 }
